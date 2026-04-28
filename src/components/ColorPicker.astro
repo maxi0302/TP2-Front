@@ -1,0 +1,96 @@
+<div class="w-full flex flex-col items-center justify-center pt-10 font-[Inter]">
+    <input
+        type="color"
+        id="colorPicker"
+        value="#2276c5"
+        class="hidden"
+    />
+
+    <label
+        for="colorPicker"
+        id="mainColorBox"
+        class="w-full max-w-300 h-55 rounded-2xl cursor-pointer shadow-lg flex items-end justify-center pb-6 hover:scale-[1.01] transition-all duration-100"
+        style="background: #2276c5"
+    >
+        <span
+            id="hexValue"
+            class="text-sm font-medium tracking-wider text-(--color-dark) bg-(--color-light) px-4 py-2 rounded-full shadow-lg backdrop-blur-sm"
+        >
+        #2276c5
+        </span>
+    </label>
+
+    <button
+        type="button"
+        id="generateButton"
+        class="mt-6 px-5 py-2 rounded-3xl bg-(--color-light-accent) shadow-md text-[20px] font-medium text-(--color-dark) transition hover:scale-[1.03] hover:active:scale-95"
+    >
+        Generar
+    </button>
+</div>
+
+<script>
+  const picker = document.getElementById("colorPicker") as HTMLInputElement | null;
+  const mainColorBox = document.getElementById("mainColorBox") as HTMLElement | null;
+  const hexValue = document.getElementById("hexValue") as HTMLElement | null;
+
+  if (picker && mainColorBox && hexValue) {
+    picker.addEventListener("input", () => {
+      const color = picker.value.toUpperCase();
+      mainColorBox.style.background = color;
+      hexValue.textContent = color;
+    });
+  }
+
+  const generateButton = document.getElementById("generateButton") as HTMLButtonElement | null;
+
+  async function generatePalette() {
+    if (!picker) return;
+
+    const selectedColor = picker.value.toUpperCase();
+    console.log("COLOR SELECCIONADO:", selectedColor);
+
+    try {
+        const response = await fetch("/api/palette", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+                body: JSON.stringify({
+                color: selectedColor,
+            }),
+        });
+
+        const data = await response.json();
+
+        const [light, lightAccent, main, darkAccent, dark] = data.colors;
+
+        document.documentElement.style.setProperty("--color-light", light);
+        document.documentElement.style.setProperty("--color-light-accent", lightAccent);
+        document.documentElement.style.setProperty("--color-main", main);
+        document.documentElement.style.setProperty("--color-dark-accent", darkAccent);
+        document.documentElement.style.setProperty("--color-dark", dark);
+
+      console.log("RESPUESTA API:", data);
+
+      window.dispatchEvent(
+        new CustomEvent("paletteGenerated", {
+          detail: { colors: data.colors },
+        })
+      );
+    } catch (error) {
+      console.error("Error llamando a la API", error);
+    }
+  }
+
+  if (generateButton) {
+    generateButton.addEventListener("click", generatePalette);
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.code === "Space") {
+      event.preventDefault();
+      generatePalette();
+    }
+  });
+</script>
