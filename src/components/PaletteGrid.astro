@@ -1,0 +1,64 @@
+---
+const colors = [
+  "#F4F4F4",
+  "#ABD6E7",
+  "#2276C5",
+  "#4B5D8F",
+  "#1A2130"
+];
+
+const labels = [
+  "Tono claro",
+  "Acento claro",
+  "Color principal de la marca",
+  "Acento oscuro",
+  "Tono oscuro"
+];
+---
+<div class="w-full max-w-300 mx-auto mt-7 bg-(--color-main) p-6 rounded-2xl shadow-md">
+
+  <div class="grid grid-cols-5 w-full max-w-300 mx-auto gap-4 font-[Inter]">
+
+    {colors.map((color, index) => (
+
+      <div
+        class={`palette-block h-100 w-full flex items-end justify-center pb-4 rounded-xl shadow-lg hover:scale-[1.01] transition-all duration-100 ${
+        index === 2 ? "border-4 border-(--color-light)" : ""
+        }`}
+        style={`background-color: ${color}`}
+      > 
+        <div class="flex flex-col items-center gap-5">
+
+          <span class="hex font-medium text-[14px] tracking-wider px-3 py-1 rounded-full text-(--color-dark) bg-(--color-light) shadow-lg">
+            {color}
+          </span>
+
+          <span class="font-medium text-[11px] tracking-wider px-3 py-1 rounded-full text-(--color-dark) bg-(--color-light) shadow-lg">
+            {labels[index]}
+          </span>
+
+        </div>
+
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  const blocks = document.querySelectorAll<HTMLElement>(".palette-block");
+  const hexLabels = document.querySelectorAll<HTMLElement>(".hex");
+  
+  window.addEventListener("paletteGenerated", (event: Event) => {
+    const customEvent = event as CustomEvent<{ colors: string[] }>;
+    const colors = customEvent.detail.colors;
+
+    colors.forEach((color: string, index: number) => {
+      const block = blocks[index];
+      const label = hexLabels[index];
+
+      if (block) block.style.backgroundColor = color;
+      if (label) label.textContent = color;
+    });
+
+  });
+</script>
