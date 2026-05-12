@@ -1,0 +1,37 @@
+---
+const savedPalettes = [
+  ["#F5F5F5", "#C9D6C2", "#009E03", "#2F6B35", "#102815"],
+  ["#FFF1F2", "#FDA4AF", "#E11D48", "#881337", "#4C0519"],
+  ["#EFF6FF", "#93C5FD", "#2563EB", "#1E40AF", "#172554"],
+];
+---
+
+<section class="w-full max-w-300 mx-auto mt-10 font-[Inter]">
+  <div class="mb-4">
+    <h2 class="text-[22px] font-semibold text-(--color-dark)">
+      Saved palettes
+    </h2>
+    <p class="text-sm text-(--color-dark-accent)">
+      Your saved color combinations will appear here.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4">
+    {savedPalettes.map((palette) => (
+      <div class="bg-white/80 rounded-2xl p-4 shadow-md backdrop-blur-sm">
+        <div class="grid grid-cols-5 gap-2">
+          {palette.map((color) => (
+            <div
+              class="h-20 rounded-xl flex items-end justify-center pb-2"
+              style={`background-color: ${color}`}
+            >
+              <span class="text-[11px] bg-white/70 text-black px-2 py-1 rounded-full">
+                {color}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

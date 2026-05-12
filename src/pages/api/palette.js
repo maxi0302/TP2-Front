@@ -1,36 +1,31 @@
 export const prerender = false;
 
+function rgbToHex(rgb) {
+  return (
+    "#" +
+    rgb
+      .map((value) =>
+        Math.max(0, Math.min(255, value))
+          .toString(16)
+          .padStart(2, "0")
+      )
+      .join("")
+      .toUpperCase()
+  );
+}
+
 export async function POST({ request }) {
   try {
     const rawBody = await request.text();
     const body = JSON.parse(rawBody);
 
-    const color = typeof body.color === "string" ? body.color : "#FFFFFF";
+    const input = Array.isArray(body.input)
+      ? body.input
+      : ["N", "N", "N", "N", "N"];
 
-    const hexToRgb = (hex) => {
-      const clean = hex.replace("#", "");
-      return [
-        parseInt(clean.slice(0, 2), 16),
-        parseInt(clean.slice(2, 4), 16),
-        parseInt(clean.slice(4, 6), 16),
-      ];
-    };
-
-    const rgbToHex = (rgb) => {
-      return (
-        "#" +
-        rgb
-          .map((v) =>
-            Math.max(0, Math.min(255, v))
-              .toString(16)
-              .padStart(2, "0")
-          )
-          .join("")
-          .toUpperCase()
-      );
-    };
-
-    const baseRgb = hexToRgb(color);
+    const lockedIndexes = input
+      .map((item, index) => (item !== "N" ? index : null))
+      .filter((index) => index !== null);
 
     const response = await fetch("http://colormind.io/api/", {
       method: "POST",
@@ -39,15 +34,31 @@ export async function POST({ request }) {
       },
       body: JSON.stringify({
         model: "ui",
-        input: ["N", "N", baseRgb, "N", "N"],
+        input,
       }),
     });
+
+    if (!response.ok) {
+      return new Response(
+        JSON.stringify({ error: "Error consultando Colormind" }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
 
     const data = await response.json();
 
     const colors = data.result.map((rgb) => rgbToHex(rgb));
 
-    colors[2] = color.toUpperCase();
+    // Mantener exactamente iguales los colores bloqueados
+    lockedIndexes.forEach((index) => {
+      const originalRgb = input[index];
+      colors[index] = rgbToHex(originalRgb);
+    });
 
     return new Response(JSON.stringify({ colors }), {
       status: 200,
@@ -56,10 +67,12 @@ export async function POST({ request }) {
       },
     });
   } catch (error) {
-    console.error("ERROR:", error);
+    console.error("ERROR EN /api/palette:", error);
 
     return new Response(
-      JSON.stringify({ error: "Error interno del servidor" }),
+      JSON.stringify({
+        error: "Error interno del servidor",
+      }),
       {
         status: 500,
         headers: {
