@@ -1,4 +1,6 @@
 ---
+import { Lock, Unlock } from "lucide-astro";
+
 const colors = [
   "#F4F4F4",
   "#ABD6E7",
@@ -10,25 +12,39 @@ const colors = [
 const labels = [
   "Tono claro",
   "Acento claro",
-  "Color principal de la marca",
+  "Color principal",
   "Acento oscuro",
   "Tono oscuro"
 ];
 ---
+
 <div class="w-full max-w-300 mx-auto mt-7 bg-(--color-main) p-6 rounded-2xl shadow-md">
-
   <div class="grid grid-cols-5 w-full max-w-300 mx-auto gap-4 font-[Inter]">
-
     {colors.map((color, index) => (
-
       <div
-        class={`palette-block h-100 w-full flex items-end justify-center pb-4 rounded-xl shadow-lg hover:scale-[1.01] transition-all duration-100 ${
-        index === 2 ? "border-4 border-(--color-light)" : ""
+        class={`palette-block relative h-100 w-full flex items-end justify-center pb-4 rounded-xl shadow-lg hover:scale-[1.01] transition-all duration-100 ${
+          index === 2 ? "border-4 border-(--color-light)" : ""
         }`}
         style={`background-color: ${color}`}
-      > 
-        <div class="flex flex-col items-center gap-5">
+        data-index={index}
+      >
+        <input
+          type="color"
+          class="color-input hidden"
+          value={color}
+          data-index={index}
+        />
 
+        <button
+          type="button"
+          class="lock-button absolute top-3 right-3 bg-white/80 text-black rounded-full w-9 h-9 shadow-md flex items-center justify-center hover:scale-110 transition"
+          data-index={index}
+        >
+          <Lock class="lock-icon hidden w-4 h-4" />
+          <Unlock class="unlock-icon w-4 h-4" />
+        </button>
+
+        <div class="flex flex-col items-center gap-5">
           <span class="hex font-medium text-[14px] tracking-wider px-3 py-1 rounded-full text-(--color-dark) bg-(--color-light) shadow-lg">
             {color}
           </span>
@@ -36,29 +52,161 @@ const labels = [
           <span class="font-medium text-[11px] tracking-wider px-3 py-1 rounded-full text-(--color-dark) bg-(--color-light) shadow-lg">
             {labels[index]}
           </span>
-
         </div>
-
       </div>
     ))}
   </div>
 </div>
 
+<div class="flex justify-center gap-4 mt-6">
+  <button
+    id="generatePaletteButton"
+    type="button"
+    class="px-6 py-2 rounded-full bg-(--color-main) text-(--color-light) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
+  >
+    Generar
+  </button>
+
+  <button
+    id="savePaletteButton"
+    type="button"
+    class="px-6 py-2 rounded-full bg-white text-(--color-dark) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
+  >
+    Guardar
+  </button>
+</div>
+
 <script>
+  let currentColors = ["#F4F4F4", "#ABD6E7", "#2276C5", "#4B5D8F", "#1A2130"];
+  let lockedColors = [false, false, false, false, false];
+
   const blocks = document.querySelectorAll<HTMLElement>(".palette-block");
   const hexLabels = document.querySelectorAll<HTMLElement>(".hex");
-  
-  window.addEventListener("paletteGenerated", (event: Event) => {
-    const customEvent = event as CustomEvent<{ colors: string[] }>;
-    const colors = customEvent.detail.colors;
+  const colorInputs = document.querySelectorAll<HTMLInputElement>(".color-input");
+  const lockButtons = document.querySelectorAll<HTMLButtonElement>(".lock-button");
+  const generateButton = document.getElementById("generatePaletteButton") as HTMLButtonElement | null;
+  const saveButton = document.getElementById("savePaletteButton") as HTMLButtonElement | null;
 
-    colors.forEach((color: string, index: number) => {
-      const block = blocks[index];
-      const label = hexLabels[index];
+  function hexToRgb(hex: string) {
+    const clean = hex.replace("#", "");
 
-      if (block) block.style.backgroundColor = color;
-      if (label) label.textContent = color;
+    return [
+      parseInt(clean.slice(0, 2), 16),
+      parseInt(clean.slice(2, 4), 16),
+      parseInt(clean.slice(4, 6), 16),
+    ];
+  }
+
+  function updateBlock(index: number, color: string) {
+    currentColors[index] = color;
+
+    const block = blocks[index];
+    const label = hexLabels[index];
+    const input = colorInputs[index];
+
+    if (block) block.style.backgroundColor = color;
+    if (label) label.textContent = color;
+    if (input) input.value = color;
+  }
+
+  function updateTheme(colors: string[]) {
+    const [light, lightAccent, main, darkAccent, dark] = colors;
+
+    document.documentElement.style.setProperty("--color-light", light);
+    document.documentElement.style.setProperty("--color-light-accent", lightAccent);
+    document.documentElement.style.setProperty("--color-main", main);
+    document.documentElement.style.setProperty("--color-dark-accent", darkAccent);
+    document.documentElement.style.setProperty("--color-dark", dark);
+  }
+
+  blocks.forEach((block, index) => {
+    block.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+
+      if (target.closest(".lock-button")) return;
+
+      const input = colorInputs[index];
+      if (input) input.click();
     });
-
   });
+
+  colorInputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      const color = input.value.toUpperCase();
+      updateBlock(index, color);
+
+      if (index === 2) {
+        document.documentElement.style.setProperty("--color-main", color);
+      }
+    });
+  });
+
+  lockButtons.forEach((button, index) => {
+    button.addEventListener("click", () => {
+      lockedColors[index] = !lockedColors[index];
+      const lockIcon = button.querySelector(".lock-icon");
+      const unlockIcon = button.querySelector(".unlock-icon");
+
+      if (lockedColors[index]) {
+        lockIcon?.classList.remove("hidden");
+        unlockIcon?.classList.add("hidden");
+      } else {
+        lockIcon?.classList.add("hidden");
+        unlockIcon?.classList.remove("hidden");
+      }
+      button.classList.toggle("ring-2", lockedColors[index]);
+      button.classList.toggle("ring-black", lockedColors[index]);
+    });
+  });
+
+  if (generateButton) {
+    generateButton.addEventListener("click", async () => {
+      const input = currentColors.map((color, index) => {
+        return lockedColors[index] ? hexToRgb(color) : "N";
+      });
+
+      try {
+        const response = await fetch("/api/palette", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ input }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error(data.error);
+          return;
+        }
+
+        data.colors.forEach((color: string, index: number) => {
+          updateBlock(index, color);
+        });
+
+        updateTheme(data.colors);
+
+        window.dispatchEvent(
+          new CustomEvent("paletteGenerated", {
+            detail: { colors: data.colors },
+          })
+        );
+      } catch (error) {
+        console.error("Error generando paleta:", error);
+      }
+    });
+  }
+
+  if (saveButton) {
+    saveButton.addEventListener("click", () => {
+      window.dispatchEvent(
+        new CustomEvent("savePalette", {
+          detail: { colors: currentColors },
+        })
+      );
+
+      console.log("PALETA GUARDADA:", currentColors);
+    });
+  }
 </script>
