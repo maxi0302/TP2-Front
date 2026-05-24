@@ -68,7 +68,7 @@ const labels = [
   <button
     id="generatePaletteButton"
     type="button"
-    class="px-6 py-2 rounded-full bg-(--color-main) text-(--color-light) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
+    class="cursor-pointer px-6 py-2 rounded-full bg-(--color-main) text-(--color-light) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
   >
     Generar
   </button>
@@ -76,7 +76,7 @@ const labels = [
   <button
     id="savePaletteButton"
     type="button"
-    class="px-6 py-2 rounded-full bg-(--color-light) text-(--color-dark) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
+    class="cursor-pointer px-6 py-2 rounded-full bg-(--color-light) text-(--color-dark) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
   >
     Guardar
   </button>
@@ -223,10 +223,7 @@ const labels = [
       if (user){
         let success = await save(user, inputName?.value, currentColors);
         if (success){
-          const showMsg = document.getElementById('showMsg');
-          if (showMsg){
-            showMsg.textContent = 'Pallette saved successfully!';
-          }
+          saveModal?.classList.add('hidden');
         }
         else{
           console.log(success);

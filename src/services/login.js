@@ -2,7 +2,7 @@ import { supabase } from '../db/supabase';
 
 export async function login(identifier, password) {
     let email = identifier;
-
+/*
     if (!identifier.includes('@')) {
         const { data, error } = await supabase
             .from('profiles')
@@ -16,11 +16,15 @@ export async function login(identifier, password) {
 
         email = data.email;
     }
+*/
 
     const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
     });
+
+  console.log(data);
+  console.log(error);
 
     return { data, error };
 }

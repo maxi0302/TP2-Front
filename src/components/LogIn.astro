@@ -12,7 +12,7 @@
       <button
         id="closePopup"
         type="button"
-        class="text-2xl text-(--color-dark) hover:text-(--color-main) hover:scale-[1.15] active:scale-95 transition"
+        class="cursor-pointer text-2xl text-(--color-dark) hover:text-(--color-main) hover:scale-[1.15] active:scale-95 transition"
       >
         ×
       </button>
@@ -21,12 +21,14 @@
     <div class="flex flex-col gap-4">
 
       <input
+        id="emailField"
         type="email"
         placeholder="Email"
         class="w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
       />
 
       <input
+        id="passwordField"
         type="password"
         placeholder="Password"
         class="w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
@@ -42,7 +44,7 @@
       <button
         id="popupActionButton"
         type="button"
-        class="mt-2 rounded-full bg-(--color-main) py-3 font-medium text-(--color-light) hover:scale-[1.01] active:scale-95 transition"
+        class="mt-2 rounded-full bg-(--color-main) py-3 font-medium text-(--color-light) hover:scale-[1.01] active:scale-95 transition cursor-pointer"
       >
         Log in
       </button>
@@ -52,6 +54,8 @@
 </div>
 
 <script>
+  import { login } from '../services/login';
+  import { signUp } from '../services/signup'
   const overlay = document.getElementById("popupOverlay");
   const closeButton = document.getElementById("closePopup");
 
@@ -60,7 +64,7 @@
 
   const title = document.getElementById("popupTitle");
   const actionButton = document.getElementById("popupActionButton");
-  const confirmField = document.getElementById("confirmPasswordField");
+  const confirmField = document.getElementById("confirmPasswordField") as HTMLInputElement;
 
   function openPopup(mode: "login" | "signup") {
     const isSignup = mode === "signup";
@@ -73,6 +77,38 @@
       actionButton.textContent = isSignup
         ? "Create account"
         : "Log in";
+        actionButton.onclick = async ()=>{
+          const passwordField = document.getElementById('passwordField') as HTMLInputElement;
+          const emailField = document.getElementById('emailField') as HTMLInputElement;
+          if (isSignup) {
+            if (confirmField.value !== passwordField.value) {
+              alert('The passwords are different!');
+              return;
+            }
+            if (passwordField.value.length < 6) {
+              alert('Password must be at least 6 characters');
+              return;
+            }
+            if (!emailField.value || !passwordField.value){
+              alert('Faltan campos a completar!');
+              return;
+            }
+            await signUp(emailField.value, passwordField.value);
+            closePopup();
+          }
+          else{
+            if (passwordField.value.length < 6) {
+              alert('Password must be at least 6 characters');
+              return;
+            }
+            if (!emailField.value || !passwordField.value){
+              alert('Faltan campos a completar!');
+              return;
+            }
+            await login(emailField.value, passwordField.value);
+            closePopup();
+          }
+        };
     }
 
     if (confirmField) {

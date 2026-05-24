@@ -1,9 +1,4 @@
 ---
-const savedPalettes = [
-  ["#F5F5F5", "#C9D6C2", "#009E03", "#2F6B35", "#102815"],
-  ["#FFF1F2", "#FDA4AF", "#E11D48", "#881337", "#4C0519"],
-  ["#EFF6FF", "#93C5FD", "#2563EB", "#1E40AF", "#172554"],
-];
 ---
 
 <section class="w-full max-w-300 mx-auto mt-7 bg-(--color-light-accent) p-6 rounded-2xl shadow-md font-[Inter]">
@@ -16,22 +11,43 @@ const savedPalettes = [
     </p>
   </div>
 
-  <div class="grid grid-cols-1 gap-4">
-    {savedPalettes.map((palette) => (
+<div id="palettesContainer" class="grid grid-cols-1 gap-4"></div>
+
+
+</section>
+<main class="pb-10"></main>
+<script>
+  import { getUser } from '../services/user';
+  import { getUserPallets } from '../services/palletssaved';
+
+  const container = document.getElementById('palettesContainer');
+
+  async function loadPalettes() {
+    const user = await getUser();
+
+    if (!user || !container) return;
+
+    const palettes = await getUserPallets(user);
+
+    container.innerHTML = palettes.map((palette) => `
       <div class="bg-white/80 rounded-2xl p-4 shadow-md backdrop-blur-sm">
+        <h3 class="mb-3 text-lg font-semibold">${palette.name}</h3>
+
         <div class="grid grid-cols-5 gap-2">
-          {palette.map((color) => (
+          ${palette.colors.map((color) => `
             <div
               class="h-20 rounded-xl flex items-end justify-center pb-2"
-              style={`background-color: ${color}`}
+              style="background-color: ${color}"
             >
               <span class="text-[11px] bg-white/70 text-black px-2 py-1 rounded-full">
-                {color}
+                ${color}
               </span>
             </div>
-          ))}
+          `).join('')}
         </div>
       </div>
-    ))}
-  </div>
-</section>
+    `).join('');
+  }
+
+  loadPalettes();
+</script>
