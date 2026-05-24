@@ -1,0 +1,106 @@
+<div
+  id="popupOverlay"
+  class="hidden fixed inset-0 z-50 bg-(--color-dark)/40 items-center justify-center font-[Inter]"
+>
+  <div class="w-full max-w-md rounded-2xl bg-(--color-light) p-6 shadow-2xl">
+
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="popupTitle" class="text-2xl font-semibold text-(--color-dark)">
+        Log in
+      </h2>
+
+      <button
+        id="closePopup"
+        type="button"
+        class="text-2xl text-(--color-dark) hover:text-(--color-main) hover:scale-[1.15] active:scale-95 transition"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-4">
+
+      <input
+        type="email"
+        placeholder="Email"
+        class="w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        class="w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
+      />
+
+      <input
+        id="confirmPasswordField"
+        type="password"
+        placeholder="Confirm password"
+        class="hidden w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
+      />
+
+      <button
+        id="popupActionButton"
+        type="button"
+        class="mt-2 rounded-full bg-(--color-main) py-3 font-medium text-(--color-light) hover:scale-[1.01] active:scale-95 transition"
+      >
+        Log in
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const overlay = document.getElementById("popupOverlay");
+  const closeButton = document.getElementById("closePopup");
+
+  const loginButton = document.getElementById("openLoginButton");
+  const signupButton = document.getElementById("openSignupButton");
+
+  const title = document.getElementById("popupTitle");
+  const actionButton = document.getElementById("popupActionButton");
+  const confirmField = document.getElementById("confirmPasswordField");
+
+  function openPopup(mode: "login" | "signup") {
+    const isSignup = mode === "signup";
+
+    if (title) {
+      title.textContent = isSignup ? "Sign up" : "Log in";
+    }
+
+    if (actionButton) {
+      actionButton.textContent = isSignup
+        ? "Create account"
+        : "Log in";
+    }
+
+    if (confirmField) {
+      confirmField.classList.toggle("hidden", !isSignup);
+    }
+
+    overlay?.classList.remove("hidden");
+    overlay?.classList.add("flex");
+  }
+
+  function closePopup() {
+    overlay?.classList.add("hidden");
+    overlay?.classList.remove("flex");
+  }
+
+  loginButton?.addEventListener("click", () => {
+    openPopup("login");
+  });
+
+  signupButton?.addEventListener("click", () => {
+    openPopup("signup");
+  });
+
+  closeButton?.addEventListener("click", closePopup);
+
+  overlay?.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      closePopup();
+    }
+  });
+</script>

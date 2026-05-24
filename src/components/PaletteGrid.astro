@@ -9,6 +9,8 @@ const colors = [
   "#1A2130"
 ];
 
+const initialLockedColors = [true, false, false, false, true];
+
 const labels = [
   "Tono claro",
   "Acento claro",
@@ -37,11 +39,15 @@ const labels = [
 
         <button
           type="button"
-          class="lock-button absolute top-3 right-3 bg-white/80 text-black rounded-full w-9 h-9 shadow-md flex items-center justify-center hover:scale-110 transition"
+          class={`lock-button absolute top-3 right-3 rounded-full w-9 h-9 shadow-md flex items-center justify-center hover:scale-110 transition ${
+          initialLockedColors[index]
+          ? "bg-white/80 text-black ring-2 ring-black"
+          : "bg-white/80 text-black"
+          }`}
           data-index={index}
         >
-          <Lock class="lock-icon hidden w-4 h-4" />
-          <Unlock class="unlock-icon w-4 h-4" />
+          <Lock class={`lock-icon w-4 h-4 ${initialLockedColors[index] ? "" : "hidden"}`} />
+          <Unlock class={`unlock-icon w-4 h-4 ${initialLockedColors[index] ? "hidden" : ""}`} />
         </button>
 
         <div class="flex flex-col items-center gap-5">
@@ -70,7 +76,7 @@ const labels = [
   <button
     id="savePaletteButton"
     type="button"
-    class="px-6 py-2 rounded-full bg-white text-(--color-dark) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
+    class="px-6 py-2 rounded-full bg-(--color-light) text-(--color-dark) font-medium shadow-md hover:scale-[1.02] active:scale-95 transition"
   >
     Guardar
   </button>
@@ -78,7 +84,7 @@ const labels = [
 
 <script>
   let currentColors = ["#F4F4F4", "#ABD6E7", "#2276C5", "#4B5D8F", "#1A2130"];
-  let lockedColors = [false, false, false, false, false];
+  let lockedColors = [true, false, false, false, true];
 
   const blocks = document.querySelectorAll<HTMLElement>(".palette-block");
   const hexLabels = document.querySelectorAll<HTMLElement>(".hex");
