@@ -1,9 +1,29 @@
 <nav class="w-full bg-(--color-light) shadow-xl">
-  <div class="flex items-center justify-center h-20">
-    <div class="w-10 h-10 rounded-2xl bg-(--color-main) mr-4 shadow-lg">
+  <div class="h-20 max-w-300 mx-auto px-8 flex items-center justify-between">
+
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-2xl bg-(--color-main) shadow-lg"></div>
+
+      <h1 class="font-[Inter] text-xl text-(--color-dark) font-semibold">
+        GENERADOR DE PALETA DE COLORES
+      </h1>
     </div>
-    <h1 class="font-[Inter] text-xl text-(--color-dark) font-semibold">
-      GENERADOR DE PALETA DE COLORES
-    </h1>
+
+    <div class="flex items-center gap-3">
+      <button
+        id="openLoginButton"
+        class="px-9 py-3 rounded-full text-sm font-medium bg-(--color-light) text-(--color-dark) shadow-lg hover:scale-[1.02] active:scale-95 transition"
+      >
+        Log in
+      </button>
+
+      <button
+        id="openSignupButton"
+        class="px-9 py-3 rounded-full text-sm font-medium bg-(--color-main) text-(--color-light) shadow-lg hover:scale-[1.02] active:scale-95 transition"
+      >
+        Sign up
+      </button>
+    </div>
+
   </div>
 </nav>
