@@ -85,6 +85,7 @@ const labels = [
 <script>
   import { save } from '../services/save';
   import { getUser } from '../services/user'
+  import { loadPalettes } from '../services/loadPallettes';
   let currentColors = ["#F4F4F4", "#ABD6E7", "#2276C5", "#4B5D8F", "#1A2130"];
   let lockedColors = [true, false, false, false, true];
 
@@ -223,6 +224,7 @@ const labels = [
       if (user){
         let success = await save(user, inputName?.value, currentColors);
         if (success){
+          await loadPalettes();
           saveModal?.classList.add('hidden');
         }
         else{
