@@ -214,15 +214,20 @@ const labels = [
     });
     finallySaveBtn?.addEventListener('click', async () => {
       const user = await getUser();
-      let success = await save(user, inputName?.value, currentColors);
-      if (success){
-        const showMsg = document.getElementById('showMsg');
-        if (showMsg){
-          showMsg.textContent = 'Pallette saved successfully!';
+      if (user){
+        let success = await save(user, inputName?.value, currentColors);
+        if (success){
+          const showMsg = document.getElementById('showMsg');
+          if (showMsg){
+            showMsg.textContent = 'Pallette saved successfully!';
+          }
+        }
+        else{
+          console.log(success);
         }
       }
       else{
-        console.log(success);
+        alert('You must be logued')
       }
     });
 </script>
