@@ -77,6 +77,8 @@ const labels = [
 </div>
 
 <script>
+  import { save } from '../services/save';
+  import { getUser } from '../services/user'
   let currentColors = ["#F4F4F4", "#ABD6E7", "#2276C5", "#4B5D8F", "#1A2130"];
   let lockedColors = [false, false, false, false, false];
 
@@ -197,16 +199,30 @@ const labels = [
       }
     });
   }
-
+  const saveModal = document.getElementById("palletteName");
   if (saveButton) {
-    saveButton.addEventListener("click", () => {
-      window.dispatchEvent(
-        new CustomEvent("savePalette", {
-          detail: { colors: currentColors },
-        })
-      );
-
-      console.log("PALETA GUARDADA:", currentColors);
-    });
+    saveButton.addEventListener('click', ()=>{
+      saveModal?.classList.remove('hidden');
+    })
   }
+
+    const cancelBtn = document.getElementById("cancel");
+    const finallySaveBtn = document.getElementById('savePall');
+    const inputName = document.getElementById('inputName') as HTMLInputElement | null;
+    cancelBtn?.addEventListener('click', ()=>{
+        saveModal?.classList.add('hidden');
+    });
+    finallySaveBtn?.addEventListener('click', async () => {
+      const user = await getUser();
+      let success = await save(user, inputName?.value, currentColors);
+      if (success){
+        const showMsg = document.getElementById('showMsg');
+        if (showMsg){
+          showMsg.textContent = 'Pallette saved successfully!';
+        }
+      }
+      else{
+        console.log(success);
+      }
+    });
 </script>
