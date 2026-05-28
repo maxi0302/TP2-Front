@@ -1,4 +1,5 @@
 import { supabase } from '../db/supabase';
+import { loadPalettes } from './loadPallettes';
 
 export async function login(identifier, password) {
     let email = identifier;
@@ -23,9 +24,18 @@ export async function login(identifier, password) {
         password,
     });
 
-  console.log(data);
-  console.log(error);
-                
+  
+    if (data.user && !error) {
+        await loadPalettes();
+        const loginButton = document.getElementById("openLoginButton");
+        const signupButton = document.getElementById("openSignupButton");
+        const logoutButton = document.getElementById("LogoutButton");
+
+        loginButton?.classList.add("hidden");
+        signupButton?.classList.add("hidden");
+
+        logoutButton?.classList.remove("hidden");
+    }
 
     return { data, error };
 }
