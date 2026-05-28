@@ -56,6 +56,7 @@
 <script>
   import { login } from '../services/login';
   import { signUp } from '../services/signup'
+  import { logout } from '../services/logout';
   const overlay = document.getElementById("popupOverlay");
   const closeButton = document.getElementById("closePopup");
 
@@ -138,5 +139,8 @@
     if (event.target === overlay) {
       closePopup();
     }
+  });
+  document.getElementById("LogoutButton")?.addEventListener("click", async () => {
+    await logout();
   });
 </script>
