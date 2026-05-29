@@ -54,93 +54,84 @@
 </div>
 
 <script>
-  import { login } from '../services/login';
-  import { signUp } from '../services/signup'
-  import { logout } from '../services/logout';
-  const overlay = document.getElementById("popupOverlay");
-  const closeButton = document.getElementById("closePopup");
-  const loginButton = document.getElementById("openLoginButton");
-  const signupButton = document.getElementById("openSignupButton");
-  const title = document.getElementById("popupTitle");
-  const actionButton = document.getElementById("popupActionButton");
-  const confirmField = document.getElementById("confirmPasswordField") as HTMLInputElement;
+    import { login } from '../services/login';
+    import { signUp } from '../services/signup';
+    import { logout } from '../services/logout';
 
-  function openPopup(mode: "login" | "signup") {
-    const isSignup = mode === "signup";
+    const overlay = document.getElementById("popupOverlay");
+    const closeButton = document.getElementById("closePopup");
+    const loginButton = document.getElementById("openLoginButton");
+    const signupButton = document.getElementById("openSignupButton");
+    const title = document.getElementById("popupTitle");
+    const actionButton = document.getElementById("popupActionButton");
+    const emailField = document.getElementById("emailField") as HTMLInputElement;
+    const passwordField = document.getElementById("passwordField") as HTMLInputElement;
+    const confirmField = document.getElementById("confirmPasswordField") as HTMLInputElement;
+    let currentMode = "login";
 
-    if (title) {
-      title.textContent = isSignup ? "Sign up" : "Log in";
+    async function handleAuth() {
+        if (!emailField.value || !passwordField.value) {
+        alert("Faltan campos a completar!");
+        return;
+        }
+        if (passwordField.value.length < 6) {
+        alert("Password must be at least 6 characters");
+        return;
+        }
+        if (currentMode === "signup") {
+        if (confirmField.value !== passwordField.value) {
+            alert("The passwords are different!");
+            return;
+        }
+        await signUp(emailField.value, passwordField.value);
+        } else {
+        await login(emailField.value, passwordField.value);
+        }
+        closePopup();
     }
 
-    if (actionButton) {
-      actionButton.textContent = isSignup
-        ? "Create account"
-        : "Log in";
-        actionButton.onclick = async () => {
-          const passwordField = document.getElementById('passwordField') as HTMLInputElement;
-          const emailField = document.getElementById('emailField') as HTMLInputElement;
-          async function handleAuth() {
-            if (!emailField.value || !passwordField.value) {
-              alert('Faltan campos a completar!');
-              return;
-            }
-            if (passwordField.value.length < 6) {
-              alert('Password must be at least 6 characters');
-              return;
-            }
-            if (isSignup) {
-              if (confirmField.value !== passwordField.value) {
-                alert('The passwords are different!');
-                return;
-              }
-              await signUp(emailField.value, passwordField.value);
-            } else {
-              await login(emailField.value, passwordField.value);
-            }
+    function openPopup(mode: string) {
+        currentMode = mode;
+        const isSignup = mode === "signup";
+        title!.textContent = isSignup ? "Sign up": "Log in";
+        actionButton!.textContent = isSignup ? "Create account" : "Log in";
+        confirmField?.classList.toggle("hidden", !isSignup);
+        overlay?.classList.remove("hidden");
+        overlay?.classList.add("flex");
+    }
+
+    function closePopup() {
+        overlay?.classList.add("hidden");
+        overlay?.classList.remove("flex");
+    }
+
+    actionButton?.addEventListener("click", async () => {
+        await handleAuth();
+    });
+
+    const fields = document.querySelectorAll("input");
+    fields.forEach((field) => {
+        field.addEventListener("keydown", async (event) => {
+        if (event.key === "Enter") {
+            await handleAuth();
+        }
+        });
+    });
+    loginButton?.addEventListener("click", () => {
+        openPopup("login");
+    });
+    signupButton?.addEventListener("click", () => {
+        openPopup("signup");
+    });
+    closeButton?.addEventListener("click", () => {
+        closePopup();
+    });
+    overlay?.addEventListener("click", (event) => {
+        if (event.target === overlay) {
             closePopup();
-          }
-
-          await handleAuth();
-          const fields = document.querySelectorAll('input');
-          fields.forEach((field) => {
-            field.addEventListener('keydown', async (event) => {
-              if (event.key === 'Enter') {
-                await handleAuth();
-              }
-            });
-          });
-        };
-    }
-  
-    if (confirmField) {
-      confirmField.classList.toggle("hidden", !isSignup);
-    }
-
-    overlay?.classList.remove("hidden");
-    overlay?.classList.add("flex");
-  }
-
-  function closePopup() {
-    overlay?.classList.add("hidden");
-    overlay?.classList.remove("flex");
-  }
-
-  loginButton?.addEventListener("click", () => {
-    openPopup("login");
-  });
-
-  signupButton?.addEventListener("click", () => {
-    openPopup("signup");
-  });
-
-  closeButton?.addEventListener("click", closePopup);
-
-  overlay?.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      closePopup();
-    }
-  });
-  document.getElementById("LogoutButton")?.addEventListener("click", async () => {
-    await logout();
-  });
+        }
+    });
+    document.getElementById("LogoutButton")?.addEventListener("click", async () => {
+        await logout();
+    });
 </script>
