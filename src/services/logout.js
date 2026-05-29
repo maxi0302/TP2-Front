@@ -1,5 +1,4 @@
 import { supabase } from '../db/supabase';
-import { loadPalettes } from './loadPallettes';
 
 export async function logout() {
     const { error } = await supabase.auth.signOut();
@@ -10,7 +9,7 @@ export async function logout() {
         loginButton?.classList.remove("hidden");
         signupButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
-        await loadPalettes();   
+        document.getElementById('palettesContainer').innerHTML = '';
     }
     return { error };
 }

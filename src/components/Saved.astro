@@ -17,7 +17,7 @@
 </section>
 <main class="pb-10"></main>
 <script>
-  import { loadPalettes } from "../services/loadPallettes";
-
-  await loadPalettes();
+  import { logout } from "../services/logout";
+  document.getElementById('palettesContainer')!.innerHTML = '';
+  await logout();
 </script>

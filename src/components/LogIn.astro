@@ -59,10 +59,8 @@
   import { logout } from '../services/logout';
   const overlay = document.getElementById("popupOverlay");
   const closeButton = document.getElementById("closePopup");
-
   const loginButton = document.getElementById("openLoginButton");
   const signupButton = document.getElementById("openSignupButton");
-
   const title = document.getElementById("popupTitle");
   const actionButton = document.getElementById("popupActionButton");
   const confirmField = document.getElementById("confirmPasswordField") as HTMLInputElement;
@@ -78,40 +76,42 @@
       actionButton.textContent = isSignup
         ? "Create account"
         : "Log in";
-        actionButton.onclick = async ()=>{
+        actionButton.onclick = async () => {
           const passwordField = document.getElementById('passwordField') as HTMLInputElement;
           const emailField = document.getElementById('emailField') as HTMLInputElement;
-          if (isSignup) {
-            if (confirmField.value !== passwordField.value) {
-              alert('The passwords are different!');
+          async function handleAuth() {
+            if (!emailField.value || !passwordField.value) {
+              alert('Faltan campos a completar!');
               return;
             }
             if (passwordField.value.length < 6) {
               alert('Password must be at least 6 characters');
               return;
             }
-            if (!emailField.value || !passwordField.value){
-              alert('Faltan campos a completar!');
-              return;
+            if (isSignup) {
+              if (confirmField.value !== passwordField.value) {
+                alert('The passwords are different!');
+                return;
+              }
+              await signUp(emailField.value, passwordField.value);
+            } else {
+              await login(emailField.value, passwordField.value);
             }
-            await signUp(emailField.value, passwordField.value);
             closePopup();
           }
-          else{
-            if (passwordField.value.length < 6) {
-              alert('Password must be at least 6 characters');
-              return;
-            }
-            if (!emailField.value || !passwordField.value){
-              alert('Faltan campos a completar!');
-              return;
-            }
-            await login(emailField.value, passwordField.value);
-            closePopup();
-          }
+
+          await handleAuth();
+          const fields = document.querySelectorAll('input');
+          fields.forEach((field) => {
+            field.addEventListener('keydown', async (event) => {
+              if (event.key === 'Enter') {
+                await handleAuth();
+              }
+            });
+          });
         };
     }
-
+  
     if (confirmField) {
       confirmField.classList.toggle("hidden", !isSignup);
     }
