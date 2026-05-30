@@ -7,8 +7,3 @@ export async function save(user, name, colors) {
 
     return { data, error };
 }
-
-/* to use this:
-const { data } = await supabase.auth.getUser();
-await save(user.id, inputName.value, colors):
-*/

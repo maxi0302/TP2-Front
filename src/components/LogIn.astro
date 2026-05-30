@@ -1,0 +1,137 @@
+<div
+  id="popupOverlay"
+  class="hidden fixed inset-0 z-50 bg-(--color-dark)/40 items-center justify-center font-[Inter]"
+>
+  <div class="w-full max-w-md rounded-2xl bg-(--color-light) p-6 shadow-2xl">
+
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="popupTitle" class="text-2xl font-semibold text-(--color-dark)">
+        Log in
+      </h2>
+
+      <button
+        id="closePopup"
+        type="button"
+        class="cursor-pointer text-2xl text-(--color-dark) hover:text-(--color-main) hover:scale-[1.15] active:scale-95 transition"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-4">
+
+      <input
+        id="emailField"
+        type="email"
+        placeholder="Email"
+        class="w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
+      />
+
+      <input
+        id="passwordField"
+        type="password"
+        placeholder="Password"
+        class="w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
+      />
+
+      <input
+        id="confirmPasswordField"
+        type="password"
+        placeholder="Confirm password"
+        class="hidden w-full rounded-xl border-2 border-(--color-light-accent) px-4 py-3 outline-none focus:border-(--color-main) focus:border-3"
+      />
+
+      <button
+        id="popupActionButton"
+        type="button"
+        class="mt-2 rounded-full bg-(--color-main) py-3 font-medium text-(--color-light) hover:scale-[1.01] active:scale-95 transition cursor-pointer"
+      >
+        Log in
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+    import { login } from '../services/login';
+    import { signUp } from '../services/signup';
+    import { logout } from '../services/logout';
+
+    const overlay = document.getElementById("popupOverlay");
+    const closeButton = document.getElementById("closePopup");
+    const loginButton = document.getElementById("openLoginButton");
+    const signupButton = document.getElementById("openSignupButton");
+    const title = document.getElementById("popupTitle");
+    const actionButton = document.getElementById("popupActionButton");
+    const emailField = document.getElementById("emailField") as HTMLInputElement;
+    const passwordField = document.getElementById("passwordField") as HTMLInputElement;
+    const confirmField = document.getElementById("confirmPasswordField") as HTMLInputElement;
+    let currentMode = "login";
+
+    async function handleAuth() {
+        if (!emailField.value || !passwordField.value) {
+        alert("Faltan campos a completar!");
+        return;
+        }
+        if (passwordField.value.length < 6) {
+        alert("Password must be at least 6 characters");
+        return;
+        }
+        if (currentMode === "signup") {
+        if (confirmField.value !== passwordField.value) {
+            alert("The passwords are different!");
+            return;
+        }
+        await signUp(emailField.value, passwordField.value);
+        } else {
+        await login(emailField.value, passwordField.value);
+        }
+        closePopup();
+    }
+
+    function openPopup(mode: string) {
+        currentMode = mode;
+        const isSignup = mode === "signup";
+        title!.textContent = isSignup ? "Sign up": "Log in";
+        actionButton!.textContent = isSignup ? "Create account" : "Log in";
+        confirmField?.classList.toggle("hidden", !isSignup);
+        overlay?.classList.remove("hidden");
+        overlay?.classList.add("flex");
+    }
+
+    function closePopup() {
+        overlay?.classList.add("hidden");
+        overlay?.classList.remove("flex");
+    }
+
+    actionButton?.addEventListener("click", async () => {
+        await handleAuth();
+    });
+
+    const fields = document.querySelectorAll("input");
+    fields.forEach((field) => {
+        field.addEventListener("keydown", async (event) => {
+        if (event.key === "Enter") {
+            await handleAuth();
+        }
+        });
+    });
+    loginButton?.addEventListener("click", () => {
+        openPopup("login");
+    });
+    signupButton?.addEventListener("click", () => {
+        openPopup("signup");
+    });
+    closeButton?.addEventListener("click", () => {
+        closePopup();
+    });
+    overlay?.addEventListener("click", (event) => {
+        if (event.target === overlay) {
+            closePopup();
+        }
+    });
+    document.getElementById("LogoutButton")?.addEventListener("click", async () => {
+        await logout();
+    });
+</script>

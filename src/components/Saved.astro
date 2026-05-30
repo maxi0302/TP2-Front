@@ -1,0 +1,23 @@
+---
+---
+
+<section class="w-full max-w-300 mx-auto mt-7 bg-(--color-light-accent) p-6 rounded-2xl shadow-md font-[Inter]">
+  <div class="mb-4 w-full mx-auto bg-(--color-light) p-6 rounded-2xl shadow-md font-[Inter]">
+    <h2 class="text-[22px] font-semibold text-(--color-dark)">
+      Paletas guardadas
+    </h2>
+    <p class="text-sm text-(--color-main)">
+      Tus combinaciones de colores guardadas aparecerán aquí.
+    </p>
+  </div>
+
+<div id="palettesContainer" class="grid grid-cols-1 gap-4"></div>
+
+
+</section>
+<main class="pb-10"></main>
+<script>
+  import { logout } from "../services/logout";
+  document.getElementById('palettesContainer')!.innerHTML = '';
+  await logout();
+</script>
