@@ -12,10 +12,16 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/vercel": "^10.0.8",
     "@supabase/supabase-js": "^2.104.0",
     "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.1.8",
     "lucide-astro": "^0.556.0",
     "tailwindcss": "^4.2.4"
+  },
+  "devDependencies": {
+    "eslint": "^10.5.0",
+    "playwright": "^1.61.1",
+    "vitest": "^4.1.9"
   }
 }
