@@ -2,9 +2,6 @@ name: CI/CD
 
 on:
   push:
-    branches:
-      - master
-      - Develop
 
   pull_request:
 
