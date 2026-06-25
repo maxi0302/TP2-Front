@@ -8,8 +8,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "test": "vitest run",
+    "test:e2e":"playwright test",
+    "lint":"eslint ."
   },
   "dependencies": {
     "@astrojs/vercel": "^10.0.8",
