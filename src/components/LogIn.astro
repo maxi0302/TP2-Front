@@ -49,6 +49,11 @@
         Log in
       </button>
 
+      <p
+        id="popupError"
+        class="hidden text-center text-sm text-red-500 font-medium"
+      ></p>
+
     </div>
   </div>
 </div>
@@ -67,35 +72,81 @@
     const emailField = document.getElementById("emailField") as HTMLInputElement;
     const passwordField = document.getElementById("passwordField") as HTMLInputElement;
     const confirmField = document.getElementById("confirmPasswordField") as HTMLInputElement;
+    const popupError = document.getElementById("popupError") as HTMLParagraphElement;
+
     let currentMode = "login";
 
+    function showError(message: string) {
+        popupError.textContent = message;
+        popupError.classList.remove("hidden");
+    }
+
+    function clearError() {
+        popupError.textContent = "";
+        popupError.classList.add("hidden");
+    }
+
     async function handleAuth() {
+
+        clearError();
+
         if (!emailField.value || !passwordField.value) {
-        alert("Faltan campos a completar!");
-        return;
-        }
-        if (passwordField.value.length < 6) {
-        alert("Password must be at least 6 characters");
-        return;
-        }
-        if (currentMode === "signup") {
-        if (confirmField.value !== passwordField.value) {
-            alert("The passwords are different!");
+            showError("Please complete all fields.");
             return;
         }
-        await signUp(emailField.value, passwordField.value);
-        } else {
-        await login(emailField.value, passwordField.value);
+
+        if (passwordField.value.length < 6) {
+            showError("Password must be at least 6 characters.");
+            return;
         }
+
+        if (currentMode === "signup") {
+
+            if (confirmField.value !== passwordField.value) {
+                showError("Passwords do not match.");
+                return;
+            }
+
+            const { error } = await signUp(
+                emailField.value,
+                passwordField.value
+            );
+
+            if (error) {
+                showError(error.message);
+                return;
+            }
+
+        } else {
+
+            const { error } = await login(
+                emailField.value,
+                passwordField.value
+            );
+
+            if (error) {
+                showError(error.message);
+                return;
+            }
+
+        }
+
         closePopup();
     }
 
     function openPopup(mode: string) {
+
+        clearError();
+
         currentMode = mode;
+
         const isSignup = mode === "signup";
-        title!.textContent = isSignup ? "Sign up": "Log in";
+
+        title!.textContent = isSignup ? "Sign up" : "Log in";
         actionButton!.textContent = isSignup ? "Create account" : "Log in";
-        confirmField?.classList.toggle("hidden", !isSignup);
+
+        confirmField.classList.toggle("hidden", !isSignup);
+
         overlay?.classList.remove("hidden");
         overlay?.classList.add("flex");
     }
@@ -110,27 +161,33 @@
     });
 
     const fields = document.querySelectorAll("input");
+
     fields.forEach((field) => {
         field.addEventListener("keydown", async (event) => {
-        if (event.key === "Enter") {
-            await handleAuth();
-        }
+            if (event.key === "Enter") {
+                await handleAuth();
+            }
         });
     });
+
     loginButton?.addEventListener("click", () => {
         openPopup("login");
     });
+
     signupButton?.addEventListener("click", () => {
         openPopup("signup");
     });
+
     closeButton?.addEventListener("click", () => {
         closePopup();
     });
+
     overlay?.addEventListener("click", (event) => {
         if (event.target === overlay) {
             closePopup();
         }
     });
+
     document.getElementById("LogoutButton")?.addEventListener("click", async () => {
         await logout();
     });

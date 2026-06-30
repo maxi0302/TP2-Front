@@ -1,3 +1,4 @@
+import { showPopup } from "../../services/popup";
 export const prerender = false;
 
 function rgbToHex(rgb) {
@@ -67,8 +68,8 @@ export async function POST({ request }) {
       },
     });
   } catch (error) {
-    console.error("ERROR EN /api/palette:", error);
-
+    showPopup("ERROR EN /api/palette:", error)
+    
     return new Response(
       JSON.stringify({
         error: "Error interno del servidor",
