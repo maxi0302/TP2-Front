@@ -86,6 +86,7 @@ const labels = [
   import { save } from '../services/save';
   import { getUser } from '../services/user';
   import { loadPalettes } from '../services/loadPallettes';
+  import { showPopup } from '../services/popup';
 
   let currentColors = ["#F4F4F4", "#ABD6E7", "#2276C5", "#4B5D8F", "#1A2130"];
   let lockedColors = [true, false, false, false, true];
@@ -96,23 +97,6 @@ const labels = [
   const lockButtons = document.querySelectorAll<HTMLButtonElement>(".lock-button");
   const generateButton = document.getElementById("generatePaletteButton") as HTMLButtonElement | null;
   const saveButton = document.getElementById("savePaletteButton") as HTMLButtonElement | null;
-
-  function showPopup(title: string, message: string) {
-    const popup = document.getElementById("popup");
-    const popupTitle = document.getElementById("popupTitle");
-    const popupMessage = document.getElementById("popupMessage");
-
-    if (!popup || !popupTitle || !popupMessage) {
-      console.error("Popup component not found.");
-      return;
-    }
-
-    popupTitle.textContent = title;
-    popupMessage.textContent = message;
-
-    popup.classList.remove("hidden");
-    popup.classList.add("flex");
-  }
 
   function hexToRgb(hex: string) {
     const clean = hex.replace("#", "");
@@ -243,11 +227,11 @@ const labels = [
           })
         );
       } catch (error) {
-        console.error("Error generando paleta:", error);
-
         showPopup(
           "Connection Error",
-          "No se pudo conectar con la API. Intentá nuevamente más tarde."
+          error instanceof Error
+            ? error.message
+            : "No se pudo conectar con la API. Intentá nuevamente más tarde."
         );
       }
     });
